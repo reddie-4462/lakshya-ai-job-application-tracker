@@ -1,0 +1,23 @@
+# IDEs
+.idea/
+.vscode/
+
+# Node
+node_modules/
+build/
+dist/
+
+# Java / Maven
+target/
+*.class
+
+# Logs
+*.log
+backend/build_log.txt
+backend/build_error.txt
+backend/output.txt
+backend/out2.txt
+
+# OS
+.DS_Store
+Thumbs.db
