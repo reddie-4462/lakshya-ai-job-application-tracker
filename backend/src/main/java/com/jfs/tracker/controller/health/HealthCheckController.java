@@ -1,6 +1,6 @@
 package com.jfs.tracker.controller.health;
 
-import com.jfs.tracker.service.OllamaService;
+import com.jfs.tracker.service.GeminiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class HealthCheckController {
 
     private final MongoTemplate mongoTemplate;
-    private final OllamaService ollamaService;
+    private final GeminiService geminiService;
 
     @GetMapping("/mongo")
     public ResponseEntity<Map<String, String>> checkMongoConnection() {
@@ -32,11 +32,11 @@ public class HealthCheckController {
 
     @GetMapping("/ai")
     public ResponseEntity<Map<String, String>> checkAiConnection() {
-        Map<String, Object> health = ollamaService.checkHealth();
+        Map<String, Object> health = geminiService.checkHealth();
         if ("connected".equals(health.get("status"))) {
-            return ResponseEntity.ok(Map.of("ai_service", "Ollama", "status", "connected"));
+            return ResponseEntity.ok(Map.of("ai_service", "Gemini", "status", "connected"));
         } else {
-            return ResponseEntity.status(503).body(Map.of("ai_service", "Ollama", "status", "failed"));
+            return ResponseEntity.status(503).body(Map.of("ai_service", "Gemini", "status", "failed"));
         }
     }
 }

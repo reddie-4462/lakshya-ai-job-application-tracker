@@ -1,7 +1,7 @@
 package com.jfs.tracker.controller;
 
 import com.jfs.tracker.model.mongodb.Application;
-import com.jfs.tracker.model.mongodb.User;
+import com.jfs.tracker.model.User;
 import com.jfs.tracker.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

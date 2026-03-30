@@ -4,8 +4,7 @@ import com.jfs.tracker.dto.MatchResultDTO;
 import com.jfs.tracker.model.mongodb.Application;
 import com.jfs.tracker.service.ApplicationService;
 import com.jfs.tracker.service.MatchingService;
-import com.jfs.tracker.service.OllamaService;
-import com.jfs.tracker.model.mongodb.User;
+import com.jfs.tracker.model.User;
 import com.jfs.tracker.service.ResumeParsingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,6 @@ public class ApplicationController {
     private final ApplicationService applicationService;
     private final ResumeParsingService resumeParsingService;
     private final MatchingService matchingService;
-    private final OllamaService ollamaService;
 
     // -------------------------------------------------------------------
     // Applications CRUD
@@ -42,6 +40,27 @@ public class ApplicationController {
         if (application.getCreatedAt() == null) {
             application.setCreatedAt(LocalDateTime.now());
         }
+        return ResponseEntity.ok(applicationService.saveApplication(application));
+    }
+
+    @PostMapping("/manual")
+    public ResponseEntity<Application> createManualApplication(@RequestBody Application application,
+            @AuthenticationPrincipal User user) {
+        String effectiveUserId = user != null ? user.getId() : application.getUserId();
+        if (effectiveUserId == null) {
+            return ResponseEntity.status(401).build();
+        }
+        application.setUserId(effectiveUserId);
+
+        if (application.getCreatedAt() == null) {
+            application.setCreatedAt(LocalDateTime.now());
+        }
+
+        // Ensure status is set, default to a sensible value if not provided
+        if (application.getStatus() == null || application.getStatus().isEmpty()) {
+            application.setStatus("BOOKMARKED");
+        }
+
         return ResponseEntity.ok(applicationService.saveApplication(application));
     }
 

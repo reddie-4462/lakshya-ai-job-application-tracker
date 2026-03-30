@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections;
 import java.util.HashMap;
 
 @Service
@@ -23,8 +22,10 @@ public class ApplicationService {
             application.setCreatedAt(LocalDateTime.now());
         }
         Application saved = applicationRepository.save(application);
-        activityLogService.logActivity(saved.getUserId(), "APPLICATION_CREATED", 
-            "Created application for " + saved.getRole() + " at " + saved.getCompany());
+        if (saved != null && saved.getUserId() != null) {
+            activityLogService.logActivity(saved.getUserId(), "APPLICATION_CREATED", 
+                "Created application for " + saved.getRole() + " at " + saved.getCompany());
+        }
         return saved;
     }
 
@@ -39,13 +40,18 @@ public class ApplicationService {
     }
 
     public Application updateStatus(String id, String status) {
+        if (id == null) {
+            throw new RuntimeException("Application ID cannot be null");
+        }
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Application not found"));
         String oldStatus = application.getStatus();
         application.setStatus(status);
         Application saved = applicationRepository.save(application);
-        activityLogService.logActivity(saved.getUserId(), "STATUS_UPDATED", 
-            "Status updated from " + oldStatus + " to " + status + " for " + saved.getCompany());
+        if (saved != null && saved.getUserId() != null) {
+            activityLogService.logActivity(saved.getUserId(), "STATUS_UPDATED", 
+                "Status updated from " + oldStatus + " to " + status + " for " + saved.getCompany());
+        }
         return saved;
     }
 
@@ -121,6 +127,8 @@ public class ApplicationService {
     }
 
     public void deleteApplication(String id) {
-        applicationRepository.deleteById(id);
+        if (id != null) {
+            applicationRepository.deleteById(id);
+        }
     }
 }
