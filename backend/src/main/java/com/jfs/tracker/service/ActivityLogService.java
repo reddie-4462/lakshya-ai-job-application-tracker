@@ -20,6 +20,8 @@ public class ActivityLogService {
                 .description(description)
                 .timestamp(LocalDateTime.now())
                 .build();
-        activityLogRepository.save(log);
+        if (log != null) {
+            activityLogRepository.save(log);
+        }
     }
 }

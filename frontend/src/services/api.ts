@@ -7,7 +7,7 @@ const BASE_URL = `${API_BASE}/api`;
 const api = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 120_000, // 120 s — Ollama can be slow on first inference
+  timeout: 120_000, // 120 s — OpenAI API response time
 });
 
 // Attach JWT if present

@@ -3,9 +3,8 @@ package com.jfs.tracker.service;
 import com.jfs.tracker.dto.AuthResponse;
 import com.jfs.tracker.dto.LoginRequest;
 import com.jfs.tracker.dto.RegisterRequest;
-import com.jfs.tracker.model.mongodb.User;
+import com.jfs.tracker.model.User;
 import com.jfs.tracker.repository.mongodb.UserRepository;
-import com.jfs.tracker.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +21,9 @@ public class AuthService {
     private final JwtService jwtService;
 
     public AuthResponse register(RegisterRequest request) {
+        if (request == null || request.getEmail() == null) {
+            throw new RuntimeException("Invalid registration request");
+        }
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
@@ -33,7 +35,14 @@ public class AuthService {
                 .createdAt(LocalDateTime.now())
                 .build();
 
+        if (user == null) {
+            throw new RuntimeException("Failed to create user object");
+        }
+
         User savedUser = userRepository.save(user);
+        if (savedUser == null || savedUser.getId() == null) {
+            throw new RuntimeException("Failed to save user");
+        }
         
         activityLogService.logActivity(savedUser.getId(), "USER_REGISTRATION", "User registered: " + savedUser.getEmail());
         

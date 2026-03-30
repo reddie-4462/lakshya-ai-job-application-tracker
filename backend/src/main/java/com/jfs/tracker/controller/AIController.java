@@ -2,10 +2,10 @@ package com.jfs.tracker.controller;
 
 import com.jfs.tracker.dto.MatchResultDTO;
 import com.jfs.tracker.model.mongodb.Application;
-import com.jfs.tracker.model.mongodb.User;
+import com.jfs.tracker.model.User;
 import com.jfs.tracker.service.ActivityLogService;
 import com.jfs.tracker.service.ApplicationService;
-import com.jfs.tracker.service.OllamaService;
+import com.jfs.tracker.service.GeminiService;
 import com.jfs.tracker.service.ResumeParsingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AIController {
 
-    private final OllamaService ollamaService;
+    private final GeminiService geminiService;
     private final ApplicationService applicationService;
     private final ResumeParsingService resumeParsingService;
     private final ActivityLogService activityLogService;
@@ -34,7 +34,7 @@ public class AIController {
         String resumeText = body.get("resumeText");
         String jobDescription = body.get("jobDescription");
         
-        MatchResultDTO result = ollamaService.analyzeResume(resumeText, jobDescription);
+        MatchResultDTO result = geminiService.analyzeResume(resumeText, jobDescription);
         activityLogService.logActivity(effectiveUserId, "AI_MATCHING", "Performed job-resume match analysis");
         return ResponseEntity.ok(result);
     }
@@ -46,7 +46,7 @@ public class AIController {
         if (effectiveUserId == null) return ResponseEntity.status(401).build();
         String resumeText = body.get("resumeText");
         
-        MatchResultDTO result = ollamaService.optimizeResume(resumeText);
+        MatchResultDTO result = geminiService.optimizeResume(resumeText);
         activityLogService.logActivity(effectiveUserId, "AI_OPTIMIZATION", "Performed resume optimization analysis");
         return ResponseEntity.ok(result);
     }
@@ -59,7 +59,7 @@ public class AIController {
         String resumeText = (String) request.get("resumeText");
         String jobDescription = (String) request.get("jobDescription");
 
-        MatchResultDTO aiResult = ollamaService.analyzeResume(resumeText, jobDescription);
+        MatchResultDTO aiResult = geminiService.analyzeResume(resumeText, jobDescription);
         
         activityLogService.logActivity(effectiveUserId, "AI_ANALYSIS", "Performed AI analysis for " + (request.get("company") != null ? request.get("company") : "unspecified company"));
 
@@ -95,12 +95,12 @@ public class AIController {
     @PostMapping("/chat")
     public ResponseEntity<Map<String, String>> aiChat(@RequestBody Map<String, String> request) {
         String prompt = request.get("prompt");
-        String response = ollamaService.chat(prompt);
+        String response = geminiService.chat(prompt);
         return ResponseEntity.ok(Map.of("response", response));
     }
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> aiHealth() {
-        return ResponseEntity.ok(ollamaService.checkHealth());
+        return ResponseEntity.ok(geminiService.checkHealth());
     }
 }

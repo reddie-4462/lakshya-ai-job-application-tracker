@@ -62,7 +62,7 @@ const AIAssistant: React.FC = () => {
         } catch (error) {
             setMessages((prev) => [
                 ...prev,
-                { role: 'assistant', content: "I'm sorry, I'm having trouble connecting to the AI service. Please make sure Ollama is running." },
+                { role: 'assistant', content: "I'm sorry, I'm having trouble connecting to the AI service. Please check your OpenAI API configuration." },
             ]);
         } finally {
             setLoading(false);

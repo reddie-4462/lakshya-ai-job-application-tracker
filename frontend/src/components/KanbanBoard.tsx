@@ -20,6 +20,8 @@ import {
   ApplicationModel,
 } from '../services/api';
 
+import AddApplicationModal from './AddApplicationModal';
+
 const COLUMNS: { key: ApplicationModel['status']; label: string; color: string; border: string; bg: string; text: string }[] = [
   { key: 'APPLIED', label: 'Applied', color: 'blue', border: 'border-blue-500/20', bg: 'bg-blue-500/10', text: 'text-blue-400' },
   { key: 'INTERVIEW', label: 'Interview', color: 'amber', border: 'border-amber-500/20', bg: 'bg-amber-500/10', text: 'text-amber-400' },
@@ -39,6 +41,7 @@ const KanbanBoard: React.FC = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const loadApplications = useCallback(async () => {
     setLoading(true);
@@ -136,6 +139,11 @@ const KanbanBoard: React.FC = () => {
 
   return (
     <div className="space-y-10 pb-20">
+      <AddApplicationModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onApplicationAdded={loadApplications} 
+      />
       {/* Header section with Stats Context */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-10">
         <div className="space-y-3">
@@ -179,7 +187,7 @@ const KanbanBoard: React.FC = () => {
             {COLUMNS.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
           </select>
           <button
-            onClick={() => navigate('/optimizer')}
+            onClick={() => setIsModalOpen(true)}
             className="btn-primary px-8 flex items-center gap-3 shadow-ai-glow text-xs font-black uppercase tracking-[0.15em] whitespace-nowrap"
           >
             <Plus size={18} /> New Application
@@ -197,7 +205,7 @@ const KanbanBoard: React.FC = () => {
             <p className="text-gray-500 max-w-md mx-auto font-medium italic">Your career journey begins here. Add your first application to unlock AI-powered insights and tracking.</p>
           </div>
           <button
-            onClick={() => navigate('/optimizer')}
+            onClick={() => setIsModalOpen(true)}
             className="btn-primary px-10 py-4 flex items-center gap-4 shadow-ai-glow text-sm font-black uppercase tracking-[0.2em]"
           >
             <Plus size={20} /> Add Application

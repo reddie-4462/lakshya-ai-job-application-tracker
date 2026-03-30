@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +17,9 @@ public class ResumeService {
     private final ResumeParsingService resumeParsingService;
 
     public Resume uploadAndParse(MultipartFile file, String userId) {
+        if (file == null || userId == null) {
+            throw new RuntimeException("File and User ID are required");
+        }
         String extractedText = resumeParsingService.extractText(file);
         List<String> parsedSkills = resumeParsingService.extractSkills(extractedText);
 
@@ -28,22 +30,31 @@ public class ResumeService {
                 .uploadDate(LocalDateTime.now())
                 .build();
 
+        if (resume == null) {
+            throw new RuntimeException("Failed to create resume object");
+        }
+
         Resume saved = resumeRepository.save(resume);
-        return Objects.requireNonNull(saved);
+        return saved;
     }
 
     public List<Resume> getResumesByUserId(String userId) {
         if (userId != null) {
-            return resumeRepository.findByUserIdOrderByUploadDateDesc(userId);
+            List<Resume> userResumes = resumeRepository.findByUserIdOrderByUploadDateDesc(userId);
+            return userResumes != null ? userResumes : java.util.Collections.emptyList();
         }
-        return resumeRepository.findAllByOrderByUploadDateDesc();
+        List<Resume> allResumes = resumeRepository.findAllByOrderByUploadDateDesc();
+        return allResumes != null ? allResumes : java.util.Collections.emptyList();
     }
 
     public boolean exists(String id) {
+        if (id == null) return false;
         return resumeRepository.existsById(id);
     }
 
     public void deleteResume(String id) {
-        resumeRepository.deleteById(id);
+        if (id != null) {
+            resumeRepository.deleteById(id);
+        }
     }
 }
