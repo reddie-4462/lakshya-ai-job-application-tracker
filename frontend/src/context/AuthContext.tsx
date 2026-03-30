@@ -14,19 +14,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userId = localStorage.getItem('userId');
-    const email = localStorage.getItem('email');
+    // 🛡️ ONE-TIME MIGRATION: Clear old localStorage keys to ensure new strict session rules apply
+    if (localStorage.getItem('token') || localStorage.getItem('userId')) {
+      localStorage.clear();
+    }
+
+    const token = sessionStorage.getItem('token');
+    const userId = sessionStorage.getItem('userId');
+    const email = sessionStorage.getItem('email');
 
     // 🔥 ONLY trust token for authentication status if it looks valid
-    const isTokenValid = token && token !== 'undefined' && token !== 'null' && token.length > 10;
+    const isTokenValid = token && token !== 'undefined' && token !== 'null' && token.length > 20;
 
     if (isTokenValid && userId && email) {
       setUser({ id: userId, email });
     } else {
       // Clear any partial data if some keys are missing
       if (token || userId || email) {
-        localStorage.clear();
+        sessionStorage.clear();
       }
       setUser(null);
     }
@@ -34,17 +39,17 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setLoading(false);
   }, []);
 
-  // 🔥 Authentication depends on recording the token
+  // 🔥 Authentication now uses sessionStorage for strict per-tab security
   const login = (userId: string, email: string, token: string) => {
-    localStorage.setItem('userId', userId);
-    localStorage.setItem('email', email);
-    localStorage.setItem('token', token);
+    sessionStorage.setItem('userId', userId);
+    sessionStorage.setItem('email', email);
+    sessionStorage.setItem('token', token);
 
     setUser({ id: userId, email });
   };
 
   const logout = () => {
-    localStorage.clear(); // 🔥 Full reset
+    sessionStorage.clear(); // 🔥 Full session reset
     setUser(null);
   };
 

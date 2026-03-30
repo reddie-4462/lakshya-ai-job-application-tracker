@@ -14,7 +14,7 @@ const api = axios.create({
 // Request logger and JWT attachment
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) config.headers.Authorization = `Bearer ${token}`;
 
     // Diagnostic Logging
@@ -49,8 +49,8 @@ api.interceptors.response.use(
     });
 
     if (status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
       window.location.href = '/';
     }
 
@@ -160,24 +160,24 @@ export interface ActivityPoint {
 }
 
 // Dashboard
-export const fetchDashboardStats = (userId: string = localStorage.getItem('userId') || '') =>
+export const fetchDashboardStats = (userId: string = sessionStorage.getItem('userId') || '') =>
   api.get<DashboardStats>(`/dashboard/stats`, { params: { userId } });
 
-export const fetchRecentApplications = (userId: string = localStorage.getItem('userId') || '') =>
+export const fetchRecentApplications = (userId: string = sessionStorage.getItem('userId') || '') =>
   api.get<ApplicationModel[]>(`/dashboard/recent`, { params: { userId } });
 
-export const fetchActivityData = (userId: string = localStorage.getItem('userId') || '') =>
+export const fetchActivityData = (userId: string = sessionStorage.getItem('userId') || '') =>
   api.get<ActivityPoint[]>(`/dashboard/activity`, { params: { userId } });
 
 // Applications
-export const fetchApplications = (userId: string = localStorage.getItem('userId') || '') =>
+export const fetchApplications = (userId: string = sessionStorage.getItem('userId') || '') =>
   api.get<ApplicationModel[]>(`/applications`, { params: { userId } });
 
-export const fetchResumes = (userId: string = localStorage.getItem('userId') || '') =>
+export const fetchResumes = (userId: string = sessionStorage.getItem('userId') || '') =>
   api.get<ResumeModel[]>(`/resumes`, { params: { userId } });
 
 export const createApplication = (payload: Partial<ApplicationModel>) => {
-  const userId = localStorage.getItem('userId') || '';
+  const userId = sessionStorage.getItem('userId') || '';
   return api.post<ApplicationModel>(`/applications`, { ...payload, userId });
 };
 
@@ -191,7 +191,7 @@ export const deleteResume = (id: string) =>
   api.delete(`/resumes/${id}`);
 
 // Resume upload (stores in MongoDB)
-export const uploadResume = (file: File, userId: string = localStorage.getItem('userId') || '') => {
+export const uploadResume = (file: File, userId: string = sessionStorage.getItem('userId') || '') => {
   const form = new FormData();
   form.append('file', file);
   return api.post<ResumeModel>(`/resumes/upload`, form, {
@@ -202,12 +202,12 @@ export const uploadResume = (file: File, userId: string = localStorage.getItem('
 
 // AI analysis
 export const matchResume = (resumeText: string, jobDescription: string) => {
-  const userId = localStorage.getItem('userId') || '';
+  const userId = sessionStorage.getItem('userId') || '';
   return api.post<AnalysisResult>(`/ai/match`, { resumeText, jobDescription, userId });
 };
 
 export const optimizeResume = (resumeText: string) => {
-  const userId = localStorage.getItem('userId') || '';
+  const userId = sessionStorage.getItem('userId') || '';
   return api.post<AnalysisResult>(`/ai/optimize`, { resumeText, userId });
 };
 
@@ -216,7 +216,7 @@ export const analyzeResume = (
   jobDescription: string,
   extras?: { company?: string; role?: string; userId?: string }
 ) => {
-  const userId = extras?.userId || localStorage.getItem('userId') || '';
+  const userId = extras?.userId || sessionStorage.getItem('userId') || '';
   return api.post<AnalysisResult>(`/ai/analyze`, {
     resumeText,
     jobDescription,

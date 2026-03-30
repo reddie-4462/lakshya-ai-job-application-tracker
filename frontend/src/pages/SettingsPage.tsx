@@ -37,7 +37,7 @@ const SettingsPage = () => {
             } catch (e: any) {
                 if (e?.response?.status !== 404) throw e;
             }
-            login(user?.id || "", email, localStorage.getItem('token') || "");
+            login(user?.id || "", email, sessionStorage.getItem('token') || "");
             setSuccess('Profile configuration persistent.');
             setTimeout(() => setSuccess(null), 4000);
         } catch (err: any) {
