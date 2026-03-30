@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { API_BASE } from '../config/api';
+import { createApplication, type ApplicationModel } from '../services/api';
 
 interface AddApplicationModalProps {
   isOpen: boolean;
@@ -15,7 +15,7 @@ interface AddApplicationModalProps {
 const AddApplicationModal: React.FC<AddApplicationModalProps> = ({ isOpen, onClose, onApplicationAdded }) => {
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
-  const [status, setStatus] = useState('BOOKMARKED');
+  const [status, setStatus] = useState<ApplicationModel['status']>('APPLIED');
   const [jobDescription, setJobDescription] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -26,19 +26,7 @@ const AddApplicationModal: React.FC<AddApplicationModalProps> = ({ isOpen, onClo
     }
 
     try {
-      await fetch(`${API_BASE}/applications/manual`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
-          company,
-          role,
-          status,
-          jobDescription,
-        }),
-      });
+      await createApplication({ company, role, status, jobDescription });
       onApplicationAdded();
       onClose();
     } catch (err) {
@@ -63,15 +51,14 @@ const AddApplicationModal: React.FC<AddApplicationModalProps> = ({ isOpen, onClo
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="status" className="text-right">Status</Label>
-            <Select value={status} onValueChange={setStatus}>
+            <Select value={status} onValueChange={(value) => setStatus(value as ApplicationModel['status'])}>
               <SelectTrigger className="col-span-3">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="BOOKMARKED">Bookmarked</SelectItem>
                 <SelectItem value="APPLIED">Applied</SelectItem>
-                <SelectItem value="INTERVIEWING">Interviewing</SelectItem>
-                <SelectItem value="OFFERED">Offered</SelectItem>
+                <SelectItem value="INTERVIEW">Interview</SelectItem>
+                <SelectItem value="OFFER">Offer</SelectItem>
                 <SelectItem value="REJECTED">Rejected</SelectItem>
               </SelectContent>
             </Select>
