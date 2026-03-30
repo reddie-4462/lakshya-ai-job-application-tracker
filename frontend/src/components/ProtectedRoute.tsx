@@ -8,16 +8,14 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
-  const token = localStorage.getItem('token');
 
-  // While checking authentication state, show nothing or a loader
   if (loading) {
     return null;
   }
 
-  // Require both an authenticated user context AND a valid token
-  if (!user || !token) {
-    return <Navigate to="/login" replace />;
+  // Require an authenticated user context 
+  if (!user) {
+    return <Navigate to="/" replace />;
   }
 
   // If authenticated, render children or the nested route

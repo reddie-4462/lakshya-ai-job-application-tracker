@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed }) => {
   const { logout } = useAuth();
 
   const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: FileText, label: 'My Resumes', path: '/resumes' },
     { icon: Briefcase, label: 'Applications', path: '/applications' },
     { icon: Sparkles, label: 'AI Optimizer', path: '/optimizer' },
@@ -69,7 +69,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed }) => {
             <NavLink
               key={item.label}
               to={item.path}
-              end={item.path === '/'}
               className={({ isActive }) => `
                 group relative flex items-center gap-4 px-4 py-3 rounded-2xl text-[13px] font-black uppercase tracking-widest transition-all duration-300
                 ${isActive
@@ -97,10 +96,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, setIsCollapsed }) => {
         <div className="pt-6 border-t border-white/5 space-y-2">
           <button
             onClick={() => {
-              if (window.confirm('Are you sure you want to logout?')) {
-                logout();
-                navigate('/');
-              }
+              logout();
+              navigate('/');
             }}
             className={`
               flex items-center gap-4 w-full px-4 py-3 text-gray-500 hover:text-rose-500 hover:bg-rose-500/10 rounded-2xl text-[13px] font-black uppercase tracking-widest transition-all

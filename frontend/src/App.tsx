@@ -36,12 +36,7 @@ const AppContent = () => {
   if (loading) {
     return (
       <div className="flex bg-background min-h-screen items-center justify-center">
-        <motion.div
-          animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          <Loader2 size={48} className="text-primary animate-spin" />
-        </motion.div>
+        <Loader2 size={48} className="text-primary animate-spin" />
       </div>
     );
   }
@@ -49,16 +44,21 @@ const AppContent = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        {/* Public routes */}
-        <Route path="/login" element={<Login />} />
+
+        {/* ✅ Public routes */}
+        <Route
+          path="/"
+          element={user ? <Navigate to="/dashboard" /> : <Login />}
+        />
+        <Route path="/login" element={<Navigate to="/" />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected routes */}
+        {/* ✅ Protected routes */}
         <Route element={<ProtectedRoute />}>
           <Route element={
             <div className="flex bg-background min-h-screen transition-all duration-300">
               <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
-              <div className={`flex-1 flex flex-col transition-all duration-300 ${isCollapsed ? 'pl-20' : 'pl-64'}`}>
+              <div className={`flex-1 flex flex-col ${isCollapsed ? 'pl-20' : 'pl-64'}`}>
                 <Navbar isCollapsed={isCollapsed} />
                 <main className="flex-1 p-8 pt-24 max-w-[1400px] mx-auto w-full">
                   <Outlet />
@@ -66,17 +66,20 @@ const AppContent = () => {
               </div>
             </div>
           }>
-            <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
+
+            <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
             <Route path="/optimizer" element={<PageTransition><ResumeAnalysis /></PageTransition>} />
             <Route path="/applications" element={<PageTransition><KanbanBoard /></PageTransition>} />
             <Route path="/resumes" element={<PageTransition><MyResumes /></PageTransition>} />
             <Route path="/ask-ai" element={<PageTransition><AIAssistant /></PageTransition>} />
             <Route path="/settings" element={<PageTransition><SettingsPage /></PageTransition>} />
+
           </Route>
         </Route>
 
-        {/* Global redirect */}
-        <Route path="*" element={<Navigate to={user ? "/" : "/login"} replace />} />
+        {/* ✅ Fallback */}
+        <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} replace />} />
+
       </Routes>
     </AnimatePresence>
   );
@@ -85,7 +88,7 @@ const AppContent = () => {
 function App() {
   return (
     <AuthProvider>
-      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <Router>
         <AppContent />
       </Router>
     </AuthProvider>

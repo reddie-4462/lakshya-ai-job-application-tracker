@@ -29,19 +29,11 @@ const Login = () => {
             const res = await loginUser({ email, password });
             const response = res.data;
             
-            // ── Store all auth values in localStorage
-            localStorage.setItem("userId", response.userId);
-            localStorage.setItem("email", response.email);
-            // Store JWT token so API calls include the Authorization header
-            if (response.token) {
-              localStorage.setItem("token", response.token);
-            }
+            // ── Inform AuthContext (it handles localStorage now)
+            login(response.userId, response.email, response.token || "");
 
-            // ── Inform AuthContext
-            login(response.userId, response.email);
-
-            // ── Redirect to dashboard (root protected route)
-            navigate('/');
+            // ── Redirect to dashboard (new protected route)
+            navigate('/dashboard');
         } catch (err: any) {
             const msg = err?.response?.data?.message || err?.message || 'Invalid email or password. Please try again.';
             setError(msg);

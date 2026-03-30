@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 interface AuthContextType {
   user: any | null;
-  login: (userId: string, email: string) => void;
+  login: (userId: string, email: string, token: string) => void;
   logout: () => void;
   loading: boolean;
 }
@@ -14,30 +14,37 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
     const userId = localStorage.getItem('userId');
     const email = localStorage.getItem('email');
-    const token = localStorage.getItem('token');
-    
-    if (userId && email && token) {
+
+    // 🔥 ONLY trust token for authentication status if it looks valid
+    const isTokenValid = token && token !== 'undefined' && token !== 'null' && token.length > 10;
+
+    if (isTokenValid && userId && email) {
       setUser({ id: userId, email });
     } else {
-      // Clear potentially stale partial data
+      // Clear any partial data if some keys are missing
+      if (token || userId || email) {
+        localStorage.clear();
+      }
       setUser(null);
     }
+
     setLoading(false);
   }, []);
 
-  const login = (userId: string, email: string) => {
+  // 🔥 Authentication depends on recording the token
+  const login = (userId: string, email: string, token: string) => {
     localStorage.setItem('userId', userId);
     localStorage.setItem('email', email);
+    localStorage.setItem('token', token);
+
     setUser({ id: userId, email });
   };
 
   const logout = () => {
-    localStorage.removeItem('userId');
-    localStorage.removeItem('email');
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.clear(); // 🔥 Full reset
     setUser(null);
   };
 

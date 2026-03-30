@@ -26,8 +26,8 @@ const Register = () => {
 
         try {
             await registerUser({ name, email, password });
-            // Redirect user to /login after successful registration
-            navigate('/login');
+            // Redirect user to / (root login) after successful registration
+            navigate('/');
         } catch (err: any) {
             const msg = err?.response?.data?.message || err?.message || 'Registration failed. Please try again.';
             setError(msg);
